@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/intezya/auth-service/protos/go/auth;authpb";
+
+service AuthService {
+  rpc Register(AuthenticationRequest) returns (Empty);
+  rpc Login(AuthenticationRequest) returns (TokenResponse);
+  rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse);
+  rpc BanAccount(BanAccountRequest) returns (Empty);
+}
+
+message Empty {}
+
+message AuthenticationRequest {
+  string username = 1;
+  string password = 2;
+  string hardware_id = 3;
+}
+
+message TokenResponse {
+  string token = 1;
+  int64 access_level = 2;
+  bool is_banned = 3;
+  int64 banned_until_in_unix = 4; // 0 = inf
+}
+
+message VerifyTokenRequest {
+  string token = 1;
+}
+
+message VerifyTokenResponse {
+  int64 subject = 1;
+  int64 access_level = 2;
+}
+
+message BanAccountRequest {
+  int64 subject = 1;
+  int64 ban_until_unix = 2; // 0 = inf
+  string reason = 3;
+}

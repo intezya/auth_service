@@ -1,0 +1,3 @@
+tasks:
+  dbschema-gen:
+    - go install entgo.io/ent/cmd/ent@v0.12.4
