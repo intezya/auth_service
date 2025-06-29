@@ -1,3 +1,27 @@
+version: '3'
+
 tasks:
-  dbschema-gen:
-    - go install entgo.io/ent/cmd/ent@v0.12.4
+  generate_tracing:
+    desc: "Generate tracing wrappers for services"
+    cmds:
+      - |
+        go run ./tools/generate_tracing.go \
+          --struct=authService \
+          --interface=AuthService \
+          --file=./internal/application/service/auth_service.go \
+          --output=./internal/application/service/auth_service_tracing.go
+      - | 
+        go run ./tools/generate_tracing.go \
+          --struct=accountRepository \
+          --interface=AccountRepository \
+          --interface-pkg=github.com/intezya/auth_service/internal/domain/repository \
+          --file=./internal/infrastructure/persistence/account_repository.go \
+          --output=./internal/infrastructure/persistence/account_repository_tracing.go
+      - |
+        go run ./tools/generate_tracing.go \
+          --struct=authController \
+          --interface=AuthServiceServer \
+          --interface-pkg=github.com/intezya/auth_service/protos/go/auth \
+          --file=./internal/adapters/grpc/controller.go \
+          --output=./internal/adapters/grpc/controller_tracing.go
+      - echo "Done!"

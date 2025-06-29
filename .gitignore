@@ -4,3 +4,6 @@ dist
 go.work
 go.work.sum
 .idea
+*.exe
+
+NOTES.md
