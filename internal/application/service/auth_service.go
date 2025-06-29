@@ -4,11 +4,27 @@ import (
 	"context"
 	"github.com/intezya/auth_service/internal/domain/dto"
 	"github.com/intezya/auth_service/internal/domain/repository"
-	"github.com/intezya/auth_service/internal/infrastructure/metrics/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"time"
 )
+
+type AuthService interface {
+	Register(
+		ctx context.Context,
+		username string,
+		password string,
+		hardwareId string,
+	) error
+	Login(
+		ctx context.Context,
+		username string,
+		password string,
+		hardwareId string,
+	) (*dto.AuthenticationResult, error)
+	VerifyToken(ctx context.Context, token string) (*dto.DataFromToken, error)
+	BanAccount(ctx context.Context, subject int, banUntilUnix int, reason string) error
+}
 
 type authService struct {
 	accountRepository repository.AccountRepository
@@ -34,9 +50,6 @@ func (s *authService) Register(
 	password string,
 	hardwareId string,
 ) error {
-	ctx, span := tracer.StartSpan(ctx, "AuthService.Register")
-	defer span.End()
-
 	_, err := s.accountRepository.Create(
 		ctx,
 		username,
@@ -53,9 +66,6 @@ func (s *authService) Login(
 	password string,
 	hardwareId string,
 ) (*dto.AuthenticationResult, error) {
-	ctx, span := tracer.StartSpan(ctx, "AuthService.Login")
-	defer span.End()
-
 	account, err := s.accountRepository.FindByLowerUsername(ctx, username)
 	if err != nil {
 		return nil, err
@@ -89,9 +99,6 @@ func (s *authService) Login(
 }
 
 func (s *authService) VerifyToken(ctx context.Context, token string) (*dto.DataFromToken, error) {
-	ctx, span := tracer.StartSpan(ctx, "AuthService.VerifyToken")
-	defer span.End()
-
 	data, err := s.tokenHelper.Parse(token)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
@@ -112,23 +119,14 @@ func (s *authService) VerifyToken(ctx context.Context, token string) (*dto.DataF
 }
 
 func (s *authService) encodePassword(ctx context.Context, password string) string {
-	ctx, span := tracer.StartSpan(ctx, "AuthService.encodePassword")
-	defer span.End()
-
 	return s.credentialsHelper.EncodePassword(password)
 }
 
 func (s *authService) encodeHardwareId(ctx context.Context, hardwareId string) string {
-	ctx, span := tracer.StartSpan(ctx, "AuthService.encodeHardwareId")
-	defer span.End()
-
 	return s.credentialsHelper.EncodeHardwareID(hardwareId)
 }
 
 func (s *authService) BanAccount(ctx context.Context, subject int, banUntilUnix int, banReason string) error {
-	ctx, span := tracer.StartSpan(ctx, "AuthService.BanAccount")
-	defer span.End()
-
 	reason := &banReason
 	if banReason == "" {
 		reason = nil

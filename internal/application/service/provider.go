@@ -14,6 +14,12 @@ func NewProvider(
 	tokenHelper TokenHelper,
 ) *Provider {
 	return &Provider{
-		AuthService: NewAuthService(provider.AccountRepository, credentialsHelper, tokenHelper),
+		AuthService: NewAuthServiceWithTracing(
+			NewAuthService(
+				provider.AccountRepository,
+				credentialsHelper,
+				tokenHelper,
+			),
+		),
 	}
 }

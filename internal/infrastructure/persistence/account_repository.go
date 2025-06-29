@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/intezya/auth_service/internal/adapters/mapper"
 	"github.com/intezya/auth_service/internal/domain/dto"
+	"github.com/intezya/auth_service/internal/domain/repository"
 	"github.com/intezya/auth_service/internal/infrastructure/ent"
 	entAccount "github.com/intezya/auth_service/internal/infrastructure/ent/account"
 	"github.com/intezya/auth_service/internal/infrastructure/metrics/tracer"
@@ -13,21 +14,21 @@ import (
 	"time"
 )
 
-type AccountRepository struct {
+type accountRepository struct {
 	client *ent.Client
 }
 
-func NewAccountRepository(client *ent.Client) *AccountRepository {
-	return &AccountRepository{client: client}
+func NewAccountRepository(client *ent.Client) repository.AccountRepository {
+	return &accountRepository{client: client}
 }
 
-func (r *AccountRepository) Create(
+func (r *accountRepository) Create(
 	ctx context.Context,
 	username string,
 	password string,
 	hardwareId string,
 ) (*dto.AccountDTO, error) {
-	ctx, span := tracer.StartSpan(ctx, "AccountRepository.Create")
+	ctx, span := tracer.StartSpan(ctx, "accountRepository.Create")
 	defer span.End()
 
 	account, err := r.client.Account.
@@ -43,8 +44,8 @@ func (r *AccountRepository) Create(
 	return mapper.AccountToDto(account), nil
 }
 
-func (r *AccountRepository) FindByID(ctx context.Context, id int) (*dto.AccountDTO, error) {
-	ctx, span := tracer.StartSpan(ctx, "AccountRepository.FindByID")
+func (r *accountRepository) FindByID(ctx context.Context, id int) (*dto.AccountDTO, error) {
+	ctx, span := tracer.StartSpan(ctx, "accountRepository.FindByID")
 	defer span.End()
 
 	account, err := r.client.Account.Get(ctx, id)
@@ -58,8 +59,8 @@ func (r *AccountRepository) FindByID(ctx context.Context, id int) (*dto.AccountD
 	return mapper.AccountToDto(account), nil
 }
 
-func (r *AccountRepository) FindByLowerUsername(ctx context.Context, username string) (*dto.AccountDTO, error) {
-	ctx, span := tracer.StartSpan(ctx, "AccountRepository.FindByLowerUsername")
+func (r *accountRepository) FindByLowerUsername(ctx context.Context, username string) (*dto.AccountDTO, error) {
+	ctx, span := tracer.StartSpan(ctx, "accountRepository.FindByLowerUsername")
 	defer span.End()
 
 	account, err := r.client.Account.
@@ -76,8 +77,8 @@ func (r *AccountRepository) FindByLowerUsername(ctx context.Context, username st
 	return mapper.AccountToDto(account), nil
 }
 
-func (r *AccountRepository) UpdateHardwareIDByID(ctx context.Context, id int, hardwareId string) error {
-	ctx, span := tracer.StartSpan(ctx, "AccountRepository.UpdateHardwareIDByID")
+func (r *accountRepository) UpdateHardwareIDByID(ctx context.Context, id int, hardwareId string) error {
+	ctx, span := tracer.StartSpan(ctx, "accountRepository.UpdateHardwareIDByID")
 	defer span.End()
 
 	_, err := r.client.Account.
@@ -92,7 +93,7 @@ func (r *AccountRepository) UpdateHardwareIDByID(ctx context.Context, id int, ha
 	return nil
 }
 
-func (r *AccountRepository) handleConstraintError(err error) error {
+func (r *accountRepository) handleConstraintError(err error) error {
 	if err == nil {
 		return nil
 	}
@@ -107,7 +108,7 @@ func (r *AccountRepository) handleConstraintError(err error) error {
 	return status.Errorf(codes.Internal, "unexpected internal error: %v", err)
 }
 
-func (r *AccountRepository) UpdateBannedUntilBannedReasonByID(
+func (r *accountRepository) UpdateBannedUntilBannedReasonByID(
 	ctx context.Context,
 	id int,
 	bannedUntil *time.Time,

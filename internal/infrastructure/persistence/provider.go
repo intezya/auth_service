@@ -10,5 +10,5 @@ type Provider struct {
 }
 
 func NewProvider(client *ent.Client) *Provider {
-	return &Provider{AccountRepository: NewAccountRepository(client)}
+	return &Provider{AccountRepository: NewAccountRepositoryWithTracing(NewAccountRepository(client))}
 }

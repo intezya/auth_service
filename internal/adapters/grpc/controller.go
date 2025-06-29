@@ -3,31 +3,27 @@ package grpc
 import (
 	"context"
 	"github.com/intezya/auth_service/internal/application/service"
-	"github.com/intezya/auth_service/internal/infrastructure/metrics/tracer"
 	authpb "github.com/intezya/auth_service/protos/go/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-type AuthController struct {
+type authController struct {
 	authpb.UnimplementedAuthServiceServer
 
 	authService service.AuthService
 }
 
-func NewAuthController(authService service.AuthService) *AuthController {
-	return &AuthController{
+func NewAuthController(authService service.AuthService) authpb.AuthServiceServer {
+	return &authController{
 		authService: authService,
 	}
 }
 
-func (c *AuthController) Register(
+func (c *authController) Register(
 	ctx context.Context,
 	request *authpb.AuthenticationRequest,
 ) (*authpb.Empty, error) {
-	ctx, span := tracer.StartSpan(ctx, "AuthController.Register")
-	defer span.End()
-
 	if request.GetUsername() == "" {
 		return nil, status.Error(codes.InvalidArgument, "username is required")
 	}
@@ -46,13 +42,10 @@ func (c *AuthController) Register(
 	return &authpb.Empty{}, nil
 }
 
-func (c *AuthController) Login(
+func (c *authController) Login(
 	ctx context.Context,
 	request *authpb.AuthenticationRequest,
 ) (*authpb.TokenResponse, error) {
-	ctx, span := tracer.StartSpan(ctx, "AuthController.Login")
-	defer span.End()
-
 	if request.GetUsername() == "" {
 		return nil, status.Error(codes.InvalidArgument, "username is required")
 	}
@@ -74,13 +67,10 @@ func (c *AuthController) Login(
 	}, nil
 }
 
-func (c *AuthController) VerifyToken(
+func (c *authController) VerifyToken(
 	ctx context.Context,
 	request *authpb.VerifyTokenRequest,
 ) (*authpb.VerifyTokenResponse, error) {
-	ctx, span := tracer.StartSpan(ctx, "AuthController.VerifyToken")
-	defer span.End()
-
 	if request.GetToken() == "" {
 		return nil, status.Error(codes.InvalidArgument, "token is required")
 	}
@@ -96,10 +86,7 @@ func (c *AuthController) VerifyToken(
 	}, nil
 }
 
-func (c *AuthController) BanAccount(ctx context.Context, request *authpb.BanAccountRequest) (*authpb.Empty, error) {
-	ctx, span := tracer.StartSpan(ctx, "AuthController.BanAccount")
-	defer span.End()
-
+func (c *authController) BanAccount(ctx context.Context, request *authpb.BanAccountRequest) (*authpb.Empty, error) {
 	if request.GetSubject() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "subject is required")
 	}
