@@ -31,33 +31,37 @@ A utility for automatically generating tracing wrappers around Go structs and th
 
 ```bash
 # Required
--struct string         # Name of the struct to wrap
--file string           # Go file containing the struct (optional; can be found via search)
+-struct string            # Name of the struct to wrap
+-file string              # Go file containing the struct (optional; can be found via search)
 
 # Interface config
--interface string      # Interface name (default = struct name)
--interface-pkg string  # Interface package (if different from struct's)
+-interface string         # Interface name (default = struct name)
+-interface-pkg string     # Interface package (if different from struct's)
 
 # Struct config
--struct-pkg string     # Struct package (if different from output package)
+-struct-pkg string        # Struct package (if different from output package)
 
 # Output config
--output string         # Output file (default: <struct>_tracing.go)
--package string        # Output package name (default: same as input)
+-output string            # Output file (default: <struct>_tracing.go)
+-package string           # Output package name (default: same as input)
 
 # Tracing
--tracer string         # Tracer import path (default: github.com/intezya/auth_service/internal/infrastructure/metrics/tracer)
+-tracer string            # Tracer import path (default: github.com/intezya/auth_service/internal/infrastructure/metrics/tracer)
 
 # Search
--search-dir string     # Directory to search for the struct (default: ".")
--recursive             # Enable recursive search
+-search-dir string        # Directory to search for the struct (default: ".")
+-recursive                # Enable recursive search
 
 # Interface embedding
--embed string          # Comma-separated list of interfaces to embed
--embed-pkg string      # Comma-separated list of packages for embedded interfaces
+-embed string             # Comma-separated list of interfaces to embed
+-embed-pkg string         # Comma-separated list of packages for embedded interfaces
+
+# Constructor
+-use-constructor bool     # Use constructor of original struct (default: true)
+-constructor-name string  # Original struct constructor name (default: NewCaptalizedStructName)
 
 # Debug
--verbose               # Verbose output
+-verbose                  # Verbose output
 ```
 
 ## Usage Examples
@@ -110,6 +114,8 @@ go run ./tools/generate_tracing.go \
   -embed="UnimplementedMyServiceServer,ValidationInterface" \
   -embed-pkg="github.com/example/proto,github.com/example/validation"
 ```
+
+(also see the taskfile.yaml in root of repository)
 
 ## gRPC-Specific Features
 

@@ -11,6 +11,6 @@ type Provider struct {
 
 func NewProvider(provider *service.Provider) *Provider {
 	return &Provider{
-		AuthController: NewAuthControllerWithTracing(NewAuthController(provider.AuthService)),
+		AuthController: NewAuthControllerWithTracing(provider.AuthService),
 	}
 }

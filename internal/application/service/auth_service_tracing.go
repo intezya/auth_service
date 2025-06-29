@@ -5,6 +5,7 @@ package service
 import (
 	"context"
 	"github.com/intezya/auth_service/internal/domain/dto"
+	"github.com/intezya/auth_service/internal/domain/repository"
 	tracer "github.com/intezya/auth_service/pkg/tracer"
 )
 
@@ -12,7 +13,8 @@ type authServiceWithTracing struct {
 	wrapped AuthService
 }
 
-func NewAuthServiceWithTracing(wrapped AuthService) AuthService {
+func NewAuthServiceWithTracing(accountRepository repository.AccountRepository, credentialsHelper CredentialsHelper, tokenHelper TokenHelper) AuthService {
+	wrapped := NewAuthService(accountRepository, credentialsHelper, tokenHelper)
 	return &authServiceWithTracing{
 		wrapped: wrapped,
 	}

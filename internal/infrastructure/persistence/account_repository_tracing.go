@@ -6,6 +6,7 @@ import (
 	"context"
 	"github.com/intezya/auth_service/internal/domain/dto"
 	"github.com/intezya/auth_service/internal/domain/repository"
+	"github.com/intezya/auth_service/internal/infrastructure/ent"
 	tracer "github.com/intezya/auth_service/pkg/tracer"
 	"time"
 )
@@ -14,7 +15,8 @@ type accountRepositoryWithTracing struct {
 	wrapped repository.AccountRepository
 }
 
-func NewAccountRepositoryWithTracing(wrapped repository.AccountRepository) repository.AccountRepository {
+func NewAccountRepositoryWithTracing(client *ent.Client) repository.AccountRepository {
+	wrapped := NewAccountRepository(client)
 	return &accountRepositoryWithTracing{
 		wrapped: wrapped,
 	}

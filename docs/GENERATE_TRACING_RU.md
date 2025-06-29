@@ -31,33 +31,37 @@
 
 ```bash
 # Обязательные
--struct string         # Имя структуры для обёртывания
--file string           # Go файл со структурой (опционально, можно использовать поиск)
+-struct string            # Имя структуры для обёртывания
+-file string              # Go файл со структурой (опционально, можно использовать поиск)
 
 # Конфигурация интерфейса
--interface string      # Имя интерфейса (по умолчанию = имя структуры)
--interface-pkg string  # Пакет интерфейса (если отличается от пакета структуры)
+-interface string         # Имя интерфейса (по умолчанию = имя структуры)
+-interface-pkg string     # Пакет интерфейса (если отличается от пакета структуры)
 
 # Конфигурация структуры
--struct-pkg string     # Пакет структуры (если отличается от выходного)
+-struct-pkg string        # Пакет структуры (если отличается от выходного)
 
 # Выходные параметры
--output string         # Выходной файл (по умолчанию: <struct>_tracing.go)
--package string        # Имя выходного пакета (по умолчанию: как у входного)
+-output string            # Выходной файл (по умолчанию: <struct>_tracing.go)
+-package string           # Имя выходного пакета (по умолчанию: как у входного)
 
 # Трейсинг
--tracer string         # Импорт пакета трейсера (по умолчанию: github.com/intezya/auth_service/internal/infrastructure/metrics/tracer)
+-tracer string            # Импорт пакета трейсера (по умолчанию: github.com/intezya/auth_service/internal/infrastructure/metrics/tracer)
 
 # Поиск
--search-dir string     # Директория для поиска структуры (по умолчанию: ".")
--recursive             # Рекурсивный поиск в поддиректориях
+-search-dir string        # Директория для поиска структуры (по умолчанию: ".")
+-recursive                # Рекурсивный поиск в поддиректориях
 
 # Встраивание интерфейсов
--embed string          # Список интерфейсов для встраивания (через запятую)
--embed-pkg string      # Пакеты для встраиваемых интерфейсов (через запятую)
+-embed string             # Список интерфейсов для встраивания (через запятую)
+-embed-pkg string         # Пакеты для встраиваемых интерфейсов (через запятую)
+
+# Настройка конструктора
+-use-constructor bool     # Использовать конструктор исходной структуры (по умолчанию: да)
+-constructor-name string  # Название конструктора исходной структуры (по умолчанию: NewИмяСтруктурыСБольшойБуквы)
 
 # Отладка
--verbose              # Подробный вывод
+-verbose                  # Подробный вывод
 ```
 
 ## Примеры использования
@@ -110,6 +114,8 @@ go run ./tools/generate_tracing.go \
   -embed="UnimplementedMyServiceServer,ValidationInterface" \
   -embed-pkg="github.com/example/proto,github.com/example/validation"
 ```
+
+(также посмотрите taskfile.yaml в корне репозитория)
 
 ## Специальные возможности для gRPC
 
