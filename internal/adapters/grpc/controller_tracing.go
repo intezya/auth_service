@@ -4,7 +4,7 @@ package grpc
 
 import (
 	"context"
-	tracer "github.com/intezya/auth_service/internal/infrastructure/metrics/tracer"
+	tracer "github.com/intezya/auth_service/pkg/tracer"
 	authpb "github.com/intezya/auth_service/protos/go/auth"
 )
 

@@ -6,10 +6,10 @@ import (
 	"github.com/intezya/auth_service/internal/adapters/config"
 	"github.com/intezya/auth_service/internal/adapters/grpc"
 	"github.com/intezya/auth_service/internal/application/service"
-	"github.com/intezya/auth_service/internal/infrastructure/metrics/tracer"
 	"github.com/intezya/auth_service/internal/infrastructure/persistence"
 	"github.com/intezya/auth_service/internal/pkg/crypto"
 	"github.com/intezya/auth_service/internal/pkg/jwt"
+	"github.com/intezya/auth_service/pkg/tracer"
 	"os"
 	"os/signal"
 	"sync"
@@ -42,7 +42,11 @@ func run() error {
 		return fmt.Errorf("failed to initialize logger: %w", err)
 	}
 
-	tracer.Init(config.Tracer, logger.Log)
+	err = tracer.Init(config.Tracer, logger.Log)
+	if err != nil {
+		logger.Log.Warnf("Failed to initialize tracer: %v", err)
+	}
+
 	errorz.SetValidator(validator.New())
 
 	tokenHelper := jwt.NewTokenHelper(config.JWT)
@@ -128,6 +132,8 @@ func run() error {
 	case <-time.After(time.Second):
 		logger.Log.Warn("Some services may still be running")
 	}
+
+	_ = tracer.Shutdown(shutdownCtx)
 
 	logger.Log.Info("Application shutdown completed")
 	return nil

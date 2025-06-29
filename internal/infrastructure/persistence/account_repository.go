@@ -7,7 +7,7 @@ import (
 	"github.com/intezya/auth_service/internal/domain/repository"
 	"github.com/intezya/auth_service/internal/infrastructure/ent"
 	entAccount "github.com/intezya/auth_service/internal/infrastructure/ent/account"
-	"github.com/intezya/auth_service/internal/infrastructure/metrics/tracer"
+	"github.com/intezya/auth_service/pkg/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"strings"

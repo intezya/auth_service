@@ -5,7 +5,7 @@ package service
 import (
 	"context"
 	"github.com/intezya/auth_service/internal/domain/dto"
-	tracer "github.com/intezya/auth_service/internal/infrastructure/metrics/tracer"
+	tracer "github.com/intezya/auth_service/pkg/tracer"
 )
 
 type authServiceWithTracing struct {

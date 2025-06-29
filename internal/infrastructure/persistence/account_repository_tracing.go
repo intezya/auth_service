@@ -5,8 +5,8 @@ package persistence
 import (
 	"context"
 	"github.com/intezya/auth_service/internal/domain/dto"
-	repository "github.com/intezya/auth_service/internal/domain/repository"
-	tracer "github.com/intezya/auth_service/internal/infrastructure/metrics/tracer"
+	"github.com/intezya/auth_service/internal/domain/repository"
+	tracer "github.com/intezya/auth_service/pkg/tracer"
 	"time"
 )
 

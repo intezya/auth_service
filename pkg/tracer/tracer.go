@@ -2,6 +2,8 @@ package tracer
 
 import (
 	"context"
+	"fmt"
+	"sync"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -9,6 +11,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type Logger interface {
@@ -24,7 +27,27 @@ type Config struct {
 	ServiceEnvironment string `env:"ENV" env-default:"dev"`
 }
 
-func Init(config Config, logger Logger) func() {
+var (
+	globalTracer   trace.Tracer
+	tracerProvider *sdktrace.TracerProvider
+	once           sync.Once
+	initErr        error
+)
+
+func Init(config Config, logger Logger) error {
+	once.Do(
+		func() {
+			initErr = initTracer(config, logger)
+		},
+	)
+	return initErr
+}
+
+func InitOrIgnore(config Config, logger Logger) {
+	_ = Init(config, logger)
+}
+
+func initTracer(config Config, logger Logger) error {
 	ctx := context.Background()
 
 	client := otlptracegrpc.NewClient(
@@ -34,7 +57,7 @@ func Init(config Config, logger Logger) func() {
 
 	exporter, err := otlptrace.New(ctx, client)
 	if err != nil {
-		logger.Warnf("error creating OTLP trace exporter: %v", err)
+		return fmt.Errorf("failed to create OTLP trace exporter: %w", err)
 	}
 
 	res, err := resource.New(
@@ -46,11 +69,12 @@ func Init(config Config, logger Logger) func() {
 		),
 	)
 	if err != nil {
-		logger.Warnf("error creating resource: %v", err)
+		return fmt.Errorf("failed to create resource: %w", err)
 	}
 
 	bsp := sdktrace.NewBatchSpanProcessor(exporter)
-	tracerProvider := sdktrace.NewTracerProvider(
+
+	tracerProvider = sdktrace.NewTracerProvider(
 		sdktrace.WithSampler(sdktrace.AlwaysSample()),
 		sdktrace.WithResource(res),
 		sdktrace.WithSpanProcessor(bsp),
@@ -58,11 +82,30 @@ func Init(config Config, logger Logger) func() {
 
 	otel.SetTracerProvider(tracerProvider)
 
-	logger.Infoln("Tracer initialized successfully:", config.Endpoint)
+	globalTracer = otel.Tracer(config.ServiceName)
 
-	return func() {
-		if err := tracerProvider.Shutdown(ctx); err != nil {
-			logger.Warnf("Error shutting down tracer provider: %v", err)
-		}
+	logger.Infoln("Tracer initialized successfully:", config.Endpoint)
+	return nil
+}
+
+func StartSpan(ctx context.Context, spanName string) (context.Context, trace.Span) {
+	if globalTracer == nil {
+		return ctx, trace.SpanFromContext(ctx)
 	}
+	return globalTracer.Start(ctx, spanName)
+}
+
+func Shutdown(ctx context.Context) error {
+	if tracerProvider == nil {
+		return nil
+	}
+	return tracerProvider.Shutdown(ctx)
+}
+
+func GetTracer() trace.Tracer {
+	return globalTracer
+}
+
+func IsInitialized() bool {
+	return globalTracer != nil
 }

@@ -117,7 +117,7 @@ func main() {
 		outputPkg  = flag.String("package", "", "Output package name (default: same as input)")
 		tracerPkg  = flag.String(
 			"tracer",
-			"github.com/intezya/auth_service/internal/infrastructure/metrics/tracer",
+			"github.com/intezya/auth_service/pkg/tracer",
 			"Tracer package import",
 		)
 		structPkg     = flag.String("struct-pkg", "", "Struct package import (if different from output)")
