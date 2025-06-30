@@ -15,12 +15,14 @@ func NewProvider(
 	validatorProvider *domainvalidator.Provider,
 	passwordEncoder service.PasswordEncoder,
 	tokenManager service.TokenManager,
+	hardwareIDManager service.HardwareIDManager,
 ) *Provider {
 	return &Provider{
 		AuthUseCase: NewAuthUseCase(
 			repositoryProvider.AccountRepository,
 			passwordEncoder,
 			tokenManager,
+			hardwareIDManager,
 			validatorProvider.UsernameValidator,
 			validatorProvider.PasswordValidator,
 			validatorProvider.HardwareValidator,

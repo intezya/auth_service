@@ -6,6 +6,7 @@ import (
 	"github.com/intezya/auth_service/internal/adapters/config"
 	"github.com/intezya/auth_service/internal/adapters/grpc"
 	"github.com/intezya/auth_service/internal/application/usecase"
+	"github.com/intezya/auth_service/internal/domain/service"
 	"github.com/intezya/auth_service/internal/infrastructure/ent"
 	"github.com/intezya/auth_service/internal/infrastructure/persistence"
 	"github.com/intezya/auth_service/internal/pkg/crypto"
@@ -55,7 +56,8 @@ func run() error {
 	entClient := persistence.SetupEnt(config.Ent, logger.Log)
 
 	repositories := persistence.NewProvider(entClient)
-	services := usecase.NewProvider(repositories, validators, passwordEncoder, tokenManager)
+	hardwareIDManager := service.NewHardwareIDManager(repositories.AccountRepository, passwordEncoder)
+	services := usecase.NewProvider(repositories, validators, passwordEncoder, tokenManager, hardwareIDManager)
 	controllers := grpc.NewProvider(services)
 	grpcApp := grpc.NewGRPCApp(controllers, config.Server)
 

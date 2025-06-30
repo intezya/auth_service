@@ -63,6 +63,7 @@ func NewAuthUseCase(
 	accountRepository repository.AccountRepository,
 	passwordEncoder service.PasswordEncoder,
 	tokenManager service.TokenManager,
+	hardwareIDManager service.HardwareIDManager,
 	usernameValidator service.Validator[string],
 	passwordValidator service.Validator[string],
 	hardwareValidator service.Validator[string],
@@ -74,6 +75,7 @@ func NewAuthUseCase(
 		usernameValidator: usernameValidator,
 		passwordValidator: passwordValidator,
 		hardwareValidator: hardwareValidator,
+		hardwareIDManager: hardwareIDManager,
 	}
 }
 
