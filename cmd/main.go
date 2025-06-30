@@ -6,6 +6,7 @@ import (
 	"github.com/intezya/auth_service/internal/adapters/config"
 	"github.com/intezya/auth_service/internal/adapters/grpc"
 	"github.com/intezya/auth_service/internal/application/usecase"
+	"github.com/intezya/auth_service/internal/infrastructure/ent"
 	"github.com/intezya/auth_service/internal/infrastructure/persistence"
 	"github.com/intezya/auth_service/internal/pkg/crypto"
 	"github.com/intezya/auth_service/internal/pkg/jwt"
@@ -43,13 +44,11 @@ func run() error {
 		return fmt.Errorf("failed to initialize logger: %w", err)
 	}
 
-	err = tracer.Init(config.Tracer, logger.Log)
-	if err != nil {
+	if err := tracer.Init(config.Tracer, logger.Log); err != nil {
 		logger.Log.Warnf("Failed to initialize tracer: %v", err)
 	}
 
 	errorz.SetValidator(validator.New())
-
 	validators := domainvalidator.NewProvider()
 	tokenManager := jwt.NewTokenManager(config.JWT)
 	passwordEncoder := crypto.NewPasswordEncoder(config.Crypto)
@@ -58,84 +57,46 @@ func run() error {
 	repositories := persistence.NewProvider(entClient)
 	services := usecase.NewProvider(repositories, validators, passwordEncoder, tokenManager)
 	controllers := grpc.NewProvider(services)
-
 	grpcApp := grpc.NewGRPCApp(controllers, config.Server)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
-	defer signal.Stop(sigCh)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
 
 	var wg sync.WaitGroup
-
-	errCh := make(chan error, 1)
-
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		if err := grpcApp.Start(ctx); err != nil {
-			select {
-			case errCh <- fmt.Errorf("gRPC server error: %w", err):
-			default:
-			}
+			logger.Log.Errorf("gRPC server error: %v", err)
+			stop()
 		}
 	}()
 
 	logger.Log.Info("Application started successfully")
 
-	select {
-	case sig := <-sigCh:
-		logger.Log.Infof("Received shutdown signal: %v", sig)
-	case err := <-errCh:
-		logger.Log.Errorf("Service error: %v", err)
-		cancel()
+	<-ctx.Done()
+	logger.Log.Info("Shutdown signal received")
+
+	return gracefulShutdown(grpcApp, entClient, &wg)
+}
+
+func gracefulShutdown(grpcApp *grpc.App, entClient *ent.Client, wg *sync.WaitGroup) error {
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), gracefulShutdownTimeout)
+	defer cancel()
+
+	if err := grpcApp.Shutdown(shutdownCtx); err != nil {
+		logger.Log.Errorf("Shutdown error: %v", err)
 	}
 
-	// Graceful shutdown
-	logger.Log.Info("Starting graceful shutdown...")
+	wg.Wait()
 
-	shutdownCtx, shutdownCancel := context.WithTimeout(
-		context.Background(),
-		gracefulShutdownTimeout,
-	)
-	defer shutdownCancel()
-
-	cancel()
-
-	shutdownDone := make(chan error, 1)
-	go func() {
-		if err := grpcApp.Shutdown(shutdownCtx); err != nil {
-			shutdownDone <- err
-			return
-		}
-		shutdownDone <- nil
-	}()
-
-	select {
-	case err := <-shutdownDone:
-		if err != nil {
-			logger.Log.Errorf("Shutdown error: %v", err)
-		}
-	case <-shutdownCtx.Done():
-		logger.Log.Warn("Shutdown timeout exceeded")
+	if err := tracer.Shutdown(shutdownCtx); err != nil {
+		logger.Log.Warnf("Tracer shutdown error: %v", err)
 	}
 
-	done := make(chan struct{})
-	go func() {
-		wg.Wait()
-		close(done)
-	}()
-
-	select {
-	case <-done:
-		logger.Log.Info("All services stopped")
-	case <-time.After(time.Second):
-		logger.Log.Warn("Some services may still be running")
+	if err := entClient.Close(); err != nil {
+		logger.Log.Warnf("Ent client close error: %v", err)
 	}
-
-	_ = tracer.Shutdown(shutdownCtx)
 
 	logger.Log.Info("Application shutdown completed")
 	return nil
