@@ -23,7 +23,7 @@ message TokenResponse {
   string token = 1;
   int64 access_level = 2;
   bool is_banned = 3;
-  int64 banned_until_in_unix = 4; // 0 = inf
+  int64 banned_until_in_unix = 4; // 0 = not banned
 }
 
 message VerifyTokenRequest {
@@ -37,6 +37,6 @@ message VerifyTokenResponse {
 
 message BanAccountRequest {
   int64 subject = 1;
-  int64 ban_until_unix = 2; // 0 = inf
+  int64 ban_until_unix = 2; // 0 = unban
   string reason = 3;
 }

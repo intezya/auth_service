@@ -2,14 +2,13 @@ package repository
 
 import (
 	"context"
-	"github.com/intezya/auth_service/internal/domain/dto"
-	"time"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 )
 
 type AccountRepository interface {
-	Create(ctx context.Context, username string, password string, hardwareId string) (*dto.AccountDTO, error)
-	FindByID(ctx context.Context, id int) (*dto.AccountDTO, error)
-	FindByLowerUsername(ctx context.Context, username string) (*dto.AccountDTO, error)
-	UpdateHardwareIDByID(ctx context.Context, id int, hardwareId string) error
-	UpdateBannedUntilBannedReasonByID(ctx context.Context, id int, bannedUntil *time.Time, banReason *string) error
+	Create(ctx context.Context, account *domain.Account) (*domain.Account, error)
+	FindByID(ctx context.Context, id domain.AccountID) (*domain.Account, error)
+	FindByLowerUsername(ctx context.Context, username domain.Username) (*domain.Account, error)
+	Update(ctx context.Context, account *domain.Account) error
+	ExistsByLowerUsername(ctx context.Context, username domain.Username) bool
 }

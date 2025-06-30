@@ -28,7 +28,7 @@ type TokenHelper struct {
 	expirationTime time.Duration
 }
 
-func NewTokenHelper(config Config) *TokenHelper {
+func NewTokenManager(config Config) *TokenHelper {
 	secretKey := []byte(config.SecretKey)
 
 	if len(config.SecretKey) < 32 {
@@ -62,7 +62,7 @@ func (t *TokenHelper) Generate(subject int) string {
 	return tokenString
 }
 
-func (t *TokenHelper) Parse(tokenString string) (*dto.DataFromToken, error) {
+func (t *TokenHelper) Parse(tokenString string) (*dto.TokenData, error) {
 	claims := &Claim{}
 
 	token, err := jwt.ParseWithClaims(
@@ -88,7 +88,7 @@ func (t *TokenHelper) Parse(tokenString string) (*dto.DataFromToken, error) {
 		return nil, err
 	}
 
-	return &dto.DataFromToken{
+	return &dto.TokenData{
 		ID:        claims.ID,
 		Subject:   subj,
 		Issuer:    claims.Issuer,

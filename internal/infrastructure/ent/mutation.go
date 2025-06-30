@@ -11,7 +11,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/intezya/auth_service/internal/domain/access_level"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent/predicate"
 )
@@ -37,7 +37,7 @@ type AccountMutation struct {
 	username      *string
 	password      *string
 	hardware_id   *string
-	access_level  *access_level.AccessLevel
+	access_level  *domain.AccessLevel
 	created_at    *time.Time
 	banned_until  *time.Time
 	ban_reason    *string
@@ -273,12 +273,12 @@ func (m *AccountMutation) ResetHardwareID() {
 }
 
 // SetAccessLevel sets the "access_level" field.
-func (m *AccountMutation) SetAccessLevel(all access_level.AccessLevel) {
-	m.access_level = &all
+func (m *AccountMutation) SetAccessLevel(dl domain.AccessLevel) {
+	m.access_level = &dl
 }
 
 // AccessLevel returns the value of the "access_level" field in the mutation.
-func (m *AccountMutation) AccessLevel() (r access_level.AccessLevel, exists bool) {
+func (m *AccountMutation) AccessLevel() (r domain.AccessLevel, exists bool) {
 	v := m.access_level
 	if v == nil {
 		return
@@ -289,7 +289,7 @@ func (m *AccountMutation) AccessLevel() (r access_level.AccessLevel, exists bool
 // OldAccessLevel returns the old "access_level" field's value of the Account entity.
 // If the Account object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AccountMutation) OldAccessLevel(ctx context.Context) (v access_level.AccessLevel, err error) {
+func (m *AccountMutation) OldAccessLevel(ctx context.Context) (v domain.AccessLevel, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAccessLevel is only allowed on UpdateOne operations")
 	}
@@ -574,7 +574,7 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 		m.SetHardwareID(v)
 		return nil
 	case account.FieldAccessLevel:
-		v, ok := value.(access_level.AccessLevel)
+		v, ok := value.(domain.AccessLevel)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

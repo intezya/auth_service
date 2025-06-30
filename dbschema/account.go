@@ -1,7 +1,7 @@
 package dbschema
 
 import (
-	"github.com/intezya/auth_service/internal/domain/access_level"
+	"github.com/intezya/auth_service/internal/domain/account"
 	"time"
 
 	"entgo.io/ent"
@@ -22,10 +22,10 @@ func (Account) Fields() []ent.Field {
 		field.String("hardware_id").Nillable().Optional().Unique().Sensitive(),
 
 		field.String("access_level").
-			GoType(access_level.AccessLevel(0)).
+			GoType(domain.AccessLevel(0)).
 			DefaultFunc(
-				func() access_level.AccessLevel {
-					return access_level.User
+				func() domain.AccessLevel {
+					return domain.AccessLevelUser
 				},
 			),
 

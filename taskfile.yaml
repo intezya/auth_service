@@ -6,10 +6,11 @@ tasks:
     cmds:
       - |
         go run ./tools/generate_tracing.go \
-          --struct=authService \
-          --interface=AuthService \
-          --file=./internal/application/service/auth_service.go \
-          --output=./internal/application/service/auth_service_tracing.go
+          --struct=authUseCase \
+          --interface=AuthUseCase \
+          --file=./internal/application/usecase/auth_usecase.go \
+          --output=./internal/application/usecase/auth_usecase_tracing.go \
+          --use-constructor=false
       - | 
         go run ./tools/generate_tracing.go \
           --struct=accountRepository \
@@ -24,4 +25,20 @@ tasks:
           --interface-pkg=github.com/intezya/auth_service/protos/go/auth \
           --file=./internal/adapters/grpc/controller.go \
           --output=./internal/adapters/grpc/controller_tracing.go
+      - |
+        go run ./tools/generate_tracing.go \
+          --struct=passwordEncoder \
+          --interface=PasswordEncoder \
+          --interface-pkg=github.com/intezya/auth_service/internal/domain/service \
+          --file=./internal/pkg/crypto/encoder.go \
+          --output=./internal/pkg/crypto/encoder_tracing.go
       - echo "Done!"
+  go_generate:
+    go install golang.org/x/tools/cmd/stringer@latest
+    
+    go generate ./internal/domain/account
+   
+    echo "Done!"
+
+  generate_ent:
+    go generate ./dbschema

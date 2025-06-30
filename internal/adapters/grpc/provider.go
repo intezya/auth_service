@@ -1,7 +1,7 @@
 package grpc
 
 import (
-	"github.com/intezya/auth_service/internal/application/service"
+	"github.com/intezya/auth_service/internal/application/usecase"
 	authpb "github.com/intezya/auth_service/protos/go/auth"
 )
 
@@ -9,8 +9,8 @@ type Provider struct {
 	AuthController authpb.AuthServiceServer
 }
 
-func NewProvider(provider *service.Provider) *Provider {
+func NewProvider(provider *usecase.Provider) *Provider {
 	return &Provider{
-		AuthController: NewAuthControllerWithTracing(provider.AuthService),
+		AuthController: NewAuthControllerWithTracing(provider.AuthUseCase),
 	}
 }

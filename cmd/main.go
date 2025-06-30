@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"github.com/intezya/auth_service/internal/adapters/config"
 	"github.com/intezya/auth_service/internal/adapters/grpc"
-	"github.com/intezya/auth_service/internal/application/service"
+	"github.com/intezya/auth_service/internal/application/usecase"
 	"github.com/intezya/auth_service/internal/infrastructure/persistence"
 	"github.com/intezya/auth_service/internal/pkg/crypto"
 	"github.com/intezya/auth_service/internal/pkg/jwt"
+	domainvalidator "github.com/intezya/auth_service/internal/pkg/validator"
 	"github.com/intezya/auth_service/pkg/tracer"
 	"os"
 	"os/signal"
@@ -49,12 +50,13 @@ func run() error {
 
 	errorz.SetValidator(validator.New())
 
-	tokenHelper := jwt.NewTokenHelper(config.JWT)
-	hashHelper := crypto.NewHashHelper(config.Crypto)
+	validators := domainvalidator.NewProvider()
+	tokenManager := jwt.NewTokenManager(config.JWT)
+	passwordEncoder := crypto.NewPasswordEncoder(config.Crypto)
 	entClient := persistence.SetupEnt(config.Ent, logger.Log)
 
 	repositories := persistence.NewProvider(entClient)
-	services := service.NewProvider(repositories, hashHelper, tokenHelper)
+	services := usecase.NewProvider(repositories, validators, passwordEncoder, tokenManager)
 	controllers := grpc.NewProvider(services)
 
 	grpcApp := grpc.NewGRPCApp(controllers, config.Server)

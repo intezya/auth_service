@@ -4,7 +4,7 @@ package grpc
 
 import (
 	"context"
-	"github.com/intezya/auth_service/internal/application/service"
+	"github.com/intezya/auth_service/internal/application/usecase"
 	tracer "github.com/intezya/auth_service/pkg/tracer"
 	authpb "github.com/intezya/auth_service/protos/go/auth"
 )
@@ -14,7 +14,7 @@ type authControllerWithTracing struct {
 	authpb.UnimplementedAuthServiceServer
 }
 
-func NewAuthControllerWithTracing(authService service.AuthService) authpb.AuthServiceServer {
+func NewAuthControllerWithTracing(authService usecase.AuthUseCase) authpb.AuthServiceServer {
 	wrapped := NewAuthController(authService)
 	return &authControllerWithTracing{
 		wrapped: wrapped,

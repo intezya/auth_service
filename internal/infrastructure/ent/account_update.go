@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/intezya/auth_service/internal/domain/access_level"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent/predicate"
 )
@@ -78,15 +78,15 @@ func (au *AccountUpdate) ClearHardwareID() *AccountUpdate {
 }
 
 // SetAccessLevel sets the "access_level" field.
-func (au *AccountUpdate) SetAccessLevel(all access_level.AccessLevel) *AccountUpdate {
-	au.mutation.SetAccessLevel(all)
+func (au *AccountUpdate) SetAccessLevel(dl domain.AccessLevel) *AccountUpdate {
+	au.mutation.SetAccessLevel(dl)
 	return au
 }
 
 // SetNillableAccessLevel sets the "access_level" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableAccessLevel(all *access_level.AccessLevel) *AccountUpdate {
-	if all != nil {
-		au.SetAccessLevel(*all)
+func (au *AccountUpdate) SetNillableAccessLevel(dl *domain.AccessLevel) *AccountUpdate {
+	if dl != nil {
+		au.SetAccessLevel(*dl)
 	}
 	return au
 }
@@ -286,15 +286,15 @@ func (auo *AccountUpdateOne) ClearHardwareID() *AccountUpdateOne {
 }
 
 // SetAccessLevel sets the "access_level" field.
-func (auo *AccountUpdateOne) SetAccessLevel(all access_level.AccessLevel) *AccountUpdateOne {
-	auo.mutation.SetAccessLevel(all)
+func (auo *AccountUpdateOne) SetAccessLevel(dl domain.AccessLevel) *AccountUpdateOne {
+	auo.mutation.SetAccessLevel(dl)
 	return auo
 }
 
 // SetNillableAccessLevel sets the "access_level" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableAccessLevel(all *access_level.AccessLevel) *AccountUpdateOne {
-	if all != nil {
-		auo.SetAccessLevel(*all)
+func (auo *AccountUpdateOne) SetNillableAccessLevel(dl *domain.AccessLevel) *AccountUpdateOne {
+	if dl != nil {
+		auo.SetAccessLevel(*dl)
 	}
 	return auo
 }

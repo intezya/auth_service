@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/intezya/auth_service/internal/domain/access_level"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 )
 
 const (
@@ -60,7 +60,7 @@ var (
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator func(string) error
 	// DefaultAccessLevel holds the default value on creation for the "access_level" field.
-	DefaultAccessLevel func() access_level.AccessLevel
+	DefaultAccessLevel func() domain.AccessLevel
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 )

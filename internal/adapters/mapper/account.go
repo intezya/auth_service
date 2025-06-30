@@ -1,19 +1,19 @@
 package mapper
 
 import (
-	"github.com/intezya/auth_service/internal/domain/dto"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent"
 )
 
-func AccountToDto(account *ent.Account) *dto.AccountDTO {
-	return &dto.AccountDTO{
-		ID:          account.ID,
-		Username:    account.Username,
-		Password:    account.Password,
-		HardwareID:  account.HardwareID,
-		AccessLevel: int(account.AccessLevel),
-		CreatedAt:   account.CreatedAt,
-		BannedUntil: account.BannedUntil,
-		BanReason:   account.BanReason,
-	}
+func EntAccountToDomain(account *ent.Account) *domain.Account {
+	return domain.NewAccountFromRepository(
+		domain.AccountID(account.ID),
+		domain.Username(account.Username),
+		domain.HashedPassword(account.Password),
+		(*domain.HardwareID)(account.HardwareID),
+		account.AccessLevel,
+		account.BannedUntil,
+		account.BanReason,
+		account.CreatedAt,
+	)
 }

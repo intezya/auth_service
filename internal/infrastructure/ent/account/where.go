@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/intezya/auth_service/internal/domain/access_level"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent/predicate"
 )
 
@@ -71,7 +71,7 @@ func HardwareID(v string) predicate.Account {
 }
 
 // AccessLevel applies equality check predicate on the "access_level" field. It's identical to AccessLevelEQ.
-func AccessLevel(v access_level.AccessLevel) predicate.Account {
+func AccessLevel(v domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldAccessLevel, v))
 }
 
@@ -296,71 +296,71 @@ func HardwareIDContainsFold(v string) predicate.Account {
 }
 
 // AccessLevelEQ applies the EQ predicate on the "access_level" field.
-func AccessLevelEQ(v access_level.AccessLevel) predicate.Account {
+func AccessLevelEQ(v domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldAccessLevel, v))
 }
 
 // AccessLevelNEQ applies the NEQ predicate on the "access_level" field.
-func AccessLevelNEQ(v access_level.AccessLevel) predicate.Account {
+func AccessLevelNEQ(v domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldNEQ(FieldAccessLevel, v))
 }
 
 // AccessLevelIn applies the In predicate on the "access_level" field.
-func AccessLevelIn(vs ...access_level.AccessLevel) predicate.Account {
+func AccessLevelIn(vs ...domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldIn(FieldAccessLevel, vs...))
 }
 
 // AccessLevelNotIn applies the NotIn predicate on the "access_level" field.
-func AccessLevelNotIn(vs ...access_level.AccessLevel) predicate.Account {
+func AccessLevelNotIn(vs ...domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldNotIn(FieldAccessLevel, vs...))
 }
 
 // AccessLevelGT applies the GT predicate on the "access_level" field.
-func AccessLevelGT(v access_level.AccessLevel) predicate.Account {
+func AccessLevelGT(v domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldGT(FieldAccessLevel, v))
 }
 
 // AccessLevelGTE applies the GTE predicate on the "access_level" field.
-func AccessLevelGTE(v access_level.AccessLevel) predicate.Account {
+func AccessLevelGTE(v domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldGTE(FieldAccessLevel, v))
 }
 
 // AccessLevelLT applies the LT predicate on the "access_level" field.
-func AccessLevelLT(v access_level.AccessLevel) predicate.Account {
+func AccessLevelLT(v domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldLT(FieldAccessLevel, v))
 }
 
 // AccessLevelLTE applies the LTE predicate on the "access_level" field.
-func AccessLevelLTE(v access_level.AccessLevel) predicate.Account {
+func AccessLevelLTE(v domain.AccessLevel) predicate.Account {
 	return predicate.Account(sql.FieldLTE(FieldAccessLevel, v))
 }
 
 // AccessLevelContains applies the Contains predicate on the "access_level" field.
-func AccessLevelContains(v access_level.AccessLevel) predicate.Account {
+func AccessLevelContains(v domain.AccessLevel) predicate.Account {
 	vc := v.String()
 	return predicate.Account(sql.FieldContains(FieldAccessLevel, vc))
 }
 
 // AccessLevelHasPrefix applies the HasPrefix predicate on the "access_level" field.
-func AccessLevelHasPrefix(v access_level.AccessLevel) predicate.Account {
+func AccessLevelHasPrefix(v domain.AccessLevel) predicate.Account {
 	vc := v.String()
 	return predicate.Account(sql.FieldHasPrefix(FieldAccessLevel, vc))
 }
 
 // AccessLevelHasSuffix applies the HasSuffix predicate on the "access_level" field.
-func AccessLevelHasSuffix(v access_level.AccessLevel) predicate.Account {
+func AccessLevelHasSuffix(v domain.AccessLevel) predicate.Account {
 	vc := v.String()
 	return predicate.Account(sql.FieldHasSuffix(FieldAccessLevel, vc))
 }
 
 // AccessLevelEqualFold applies the EqualFold predicate on the "access_level" field.
-func AccessLevelEqualFold(v access_level.AccessLevel) predicate.Account {
+func AccessLevelEqualFold(v domain.AccessLevel) predicate.Account {
 	vc := v.String()
 	return predicate.Account(sql.FieldEqualFold(FieldAccessLevel, vc))
 }
 
 // AccessLevelContainsFold applies the ContainsFold predicate on the "access_level" field.
-func AccessLevelContainsFold(v access_level.AccessLevel) predicate.Account {
+func AccessLevelContainsFold(v domain.AccessLevel) predicate.Account {
 	vc := v.String()
 	return predicate.Account(sql.FieldContainsFold(FieldAccessLevel, vc))
 }

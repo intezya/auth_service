@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/intezya/auth_service/dbschema"
-	"github.com/intezya/auth_service/internal/domain/access_level"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent/account"
 )
 
@@ -27,7 +27,7 @@ func init() {
 	// accountDescAccessLevel is the schema descriptor for access_level field.
 	accountDescAccessLevel := accountFields[4].Descriptor()
 	// account.DefaultAccessLevel holds the default value on creation for the access_level field.
-	account.DefaultAccessLevel = accountDescAccessLevel.Default.(func() access_level.AccessLevel)
+	account.DefaultAccessLevel = accountDescAccessLevel.Default.(func() domain.AccessLevel)
 	// accountDescCreatedAt is the schema descriptor for created_at field.
 	accountDescCreatedAt := accountFields[5].Descriptor()
 	// account.DefaultCreatedAt holds the default value on creation for the created_at field.

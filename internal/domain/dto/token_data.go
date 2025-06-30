@@ -2,7 +2,7 @@ package dto
 
 import "time"
 
-type DataFromToken struct {
+type TokenData struct {
 	ID          string    `json:"id"`
 	AccessLevel int       `json:"access_level"`
 	Subject     int       `json:"subject"`

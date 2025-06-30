@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/intezya/auth_service/internal/domain/access_level"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent/account"
 )
 
@@ -48,15 +48,15 @@ func (ac *AccountCreate) SetNillableHardwareID(s *string) *AccountCreate {
 }
 
 // SetAccessLevel sets the "access_level" field.
-func (ac *AccountCreate) SetAccessLevel(all access_level.AccessLevel) *AccountCreate {
-	ac.mutation.SetAccessLevel(all)
+func (ac *AccountCreate) SetAccessLevel(dl domain.AccessLevel) *AccountCreate {
+	ac.mutation.SetAccessLevel(dl)
 	return ac
 }
 
 // SetNillableAccessLevel sets the "access_level" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableAccessLevel(all *access_level.AccessLevel) *AccountCreate {
-	if all != nil {
-		ac.SetAccessLevel(*all)
+func (ac *AccountCreate) SetNillableAccessLevel(dl *domain.AccessLevel) *AccountCreate {
+	if dl != nil {
+		ac.SetAccessLevel(*dl)
 	}
 	return ac
 }

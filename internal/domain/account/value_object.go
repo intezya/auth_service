@@ -1,4 +1,4 @@
-package access_level
+package domain
 
 import (
 	"database/sql/driver"
@@ -7,23 +7,28 @@ import (
 	"strings"
 )
 
+type AccountID int
+type Username string
+type HashedPassword string
+type HardwareID string
+
 //go:generate stringer -type=AccessLevel
 type AccessLevel int
 
 const (
-	User AccessLevel = iota
-	ViewAllUsers
-	ViewInventory
-	ViewMatches
-	Admin
-	CreateItem
-	GiveItem
-	RevokeItem
-	UpdateItem
-	ResetHwid
-	AddAdmin
-	DeleteItem
-	Dev
+	AccessLevelUser AccessLevel = iota
+	AccessLevelViewAllUsers
+	AccessLevelViewInventory
+	AccessLevelViewMatches
+	AccessLevelAdmin
+	AccessLevelCreateItem
+	AccessLevelGiveItem
+	AccessLevelRevokeItem
+	AccessLevelUpdateItem
+	AccessLevelResetHwid
+	AccessLevelAddAdmin
+	AccessLevelDeleteItem
+	AccessLevelDev
 )
 
 var (
@@ -41,7 +46,7 @@ func (a AccessLevel) Value() (driver.Value, error) {
 func (a *AccessLevel) Scan(value interface{}) error {
 	switch typedValue := value.(type) {
 	case string:
-		for i := User; i <= Dev; i++ {
+		for i := AccessLevelUser; i <= AccessLevelDev; i++ {
 			if strings.EqualFold(i.String(), typedValue) {
 				*a = i
 
@@ -53,7 +58,7 @@ func (a *AccessLevel) Scan(value interface{}) error {
 	case []byte:
 		return a.Scan(string(typedValue))
 	case int64:
-		if typedValue >= int64(User) && typedValue <= int64(Dev) {
+		if typedValue >= int64(AccessLevelUser) && typedValue <= int64(AccessLevelDev) {
 			*a = AccessLevel(typedValue)
 
 			return nil
@@ -63,15 +68,4 @@ func (a *AccessLevel) Scan(value interface{}) error {
 	default:
 		return fmt.Errorf("%w: %T", errInvalidTypeAccessLevel, value)
 	}
-}
-
-// FromStringOrDefault converts string to AccessLevel (optional helper).
-func FromStringOrDefault(s string) AccessLevel {
-	for i := User; i <= Dev; i++ {
-		if strings.EqualFold(i.String(), s) {
-			return i
-		}
-	}
-
-	return 0
 }

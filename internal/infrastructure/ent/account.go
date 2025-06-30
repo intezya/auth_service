@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/intezya/auth_service/internal/domain/access_level"
+	domain "github.com/intezya/auth_service/internal/domain/account"
 	"github.com/intezya/auth_service/internal/infrastructure/ent/account"
 )
 
@@ -25,7 +25,7 @@ type Account struct {
 	// HardwareID holds the value of the "hardware_id" field.
 	HardwareID *string `json:"-"`
 	// AccessLevel holds the value of the "access_level" field.
-	AccessLevel access_level.AccessLevel `json:"access_level,omitempty"`
+	AccessLevel domain.AccessLevel `json:"access_level,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// BannedUntil holds the value of the "banned_until" field.
@@ -41,7 +41,7 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case account.FieldAccessLevel:
-			values[i] = new(access_level.AccessLevel)
+			values[i] = new(domain.AccessLevel)
 		case account.FieldID:
 			values[i] = new(sql.NullInt64)
 		case account.FieldUsername, account.FieldPassword, account.FieldHardwareID, account.FieldBanReason:
@@ -89,7 +89,7 @@ func (a *Account) assignValues(columns []string, values []any) error {
 				*a.HardwareID = value.String
 			}
 		case account.FieldAccessLevel:
-			if value, ok := values[i].(*access_level.AccessLevel); !ok {
+			if value, ok := values[i].(*domain.AccessLevel); !ok {
 				return fmt.Errorf("unexpected type %T for field access_level", values[i])
 			} else if value != nil {
 				a.AccessLevel = *value

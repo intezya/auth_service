@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"github.com/intezya/auth_service/internal/application/service"
+	"github.com/intezya/auth_service/internal/application/usecase"
 	authpb "github.com/intezya/auth_service/protos/go/auth"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -11,10 +11,10 @@ import (
 type authController struct {
 	authpb.UnimplementedAuthServiceServer
 
-	authService service.AuthService
+	authService usecase.AuthUseCase
 }
 
-func NewAuthController(authService service.AuthService) authpb.AuthServiceServer {
+func NewAuthController(authService usecase.AuthUseCase) authpb.AuthServiceServer {
 	return &authController{
 		authService: authService,
 	}
@@ -34,7 +34,13 @@ func (c *authController) Register(
 		return nil, status.Error(codes.InvalidArgument, "hardware_id is required")
 	}
 
-	err := c.authService.Register(ctx, request.Username, request.Password, request.HardwareId)
+	err := c.authService.Register(
+		ctx, &usecase.RegisterCommand{
+			Username:   request.Username,
+			Password:   request.Password,
+			HardwareID: request.HardwareId,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -56,14 +62,27 @@ func (c *authController) Login(
 		return nil, status.Error(codes.InvalidArgument, "hardware_id is required")
 	}
 
-	result, err := c.authService.Login(ctx, request.Username, request.Password, request.HardwareId)
+	result, err := c.authService.Login(
+		ctx, &usecase.LoginCommand{
+			Username:   request.Username,
+			Password:   request.Password,
+			HardwareID: request.HardwareId,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
 
+	var bannedUntil int64 = 0
+	if result.BannedUntil != nil {
+		bannedUntil = result.BannedUntil.Unix()
+	}
+
 	return &authpb.TokenResponse{
-		Token:       result.Token,
-		AccessLevel: int64(result.AccessLevel),
+		Token:             result.Token,
+		AccessLevel:       int64(result.AccessLevel),
+		BannedUntilInUnix: bannedUntil,
+		IsBanned:          bannedUntil == 0,
 	}, nil
 }
 
@@ -75,7 +94,11 @@ func (c *authController) VerifyToken(
 		return nil, status.Error(codes.InvalidArgument, "token is required")
 	}
 
-	result, err := c.authService.VerifyToken(ctx, request.GetToken())
+	result, err := c.authService.VerifyToken(
+		ctx, &usecase.VerifyTokenCommand{
+			Token: request.Token,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -91,11 +114,18 @@ func (c *authController) BanAccount(ctx context.Context, request *authpb.BanAcco
 		return nil, status.Error(codes.InvalidArgument, "subject is required")
 	}
 
+	reason := &request.Reason
+	if request.Reason == "" {
+		reason = nil
+	}
+
 	err := c.authService.BanAccount(
 		ctx,
-		int(request.GetSubject()),
-		int(request.GetBanUntilUnix()),
-		request.GetReason(),
+		&usecase.BanAccountCommand{
+			AccountID:    int(request.Subject),
+			BanUntilUnix: request.BanUntilUnix,
+			BanReason:    reason,
+		},
 	)
 	if err != nil {
 		return nil, err
